@@ -25,16 +25,15 @@ int main(void) {
   TACTL = TASSEL_2 | MC_2;          // start timer in up/down mode
 
   // Set the direction of the start button. Keep initial input low.
-  P1DIR = ~START_BUTTON;
-  P1IN  = ~START_BUTTON;
+  P1DIR &= ~START_BUTTON;
+  P1IN  &= ~START_BUTTON;
 
   // Set the direction of color bits as input to the msp430. Keep initial input zero.
   P1DIR &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
 
-  // Initialize top index and color
+  // Initialize top index
   Top_LED_Index = 29;
-  Top_LED_Color = LED_Strip_1[Top_LED_Index];
 
   // Generate random seed
   while ((~P1IN) & START_BUTTON);   // loop while the START_BUTTON is unset
@@ -44,11 +43,15 @@ int main(void) {
   // Generate a random sequence of colors for the LED strips 1 and 2
   int randomColor;
   for (int i = 0; i < 30; i++ ) {
+    seed = seed + i;
     randomColor = random(seed);
     LED_Strip_1[i] = randomColor;
     LED_Strip_2[i] = randomColor;
     // printf("LED_Strip_1[%d] = %d\n", i, LED_Strip_1[i] );
   }
+
+  // Initialize top LED color
+  Top_LED_Color = LED_Strip_1[Top_LED_Index];
 
   // Light up the addressable LED strips
 
@@ -111,10 +114,9 @@ int main(void) {
   return 0;
 }
 
-// Generate a random number ranging from MIN_RAND to MAX_RAND.
+// Generate a random number ranging from 1 to 4.
 // This function doesn't truely generate a random number but it is good enough
 // for the purpose of this porject.
 int random(int x) {
-  seed++;
-  return ((x % 7) + (x % 3)) % 5;
+  return ((x % 11) + (x % 3)) % 5;
 }
