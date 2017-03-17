@@ -3,26 +3,27 @@
 
 #define START_BUTTON    BIT4
 
-#define RED     0
-#define YELLOW  1
-#define BLUE    2
-#define GREEN   3
+#define RED     ((char)0)
+#define YELLOW  ((char)1)
+#define BLUE    ((char)2)
+#define GREEN   ((char)3)
 
-#define BLACK   5
+#define BLACK   ((char)5)
 
 #define RED_BUTTON      BIT0
 #define YELLOW_BUTTON   BIT1
 #define BLUE_BUTTON     BIT2
 #define GREEN_BUTTON    BIT3
 
-int seed; // seed for generating a random numbers
-int LED_Strip_1[30];        // this will hold the color sequence of strip_1
-int LED_Strip_2[30];        // this will hold the color sequence of strip_2
-int Top_LED_Index;          // Index of top lit LED. Will be decremented down to 0.
-int Top_LED_Color;          // Color of top lit LED
+char seed;                   // seed for generating a random numbers
+char LED_Strip_1[30];        // this will hold the color sequence of strip_1
+char LED_Strip_2[30];        // this will hold the color sequence of strip_2
+char Top_LED_Index;          // Index of top lit LED. Will be decremented down to 0.
+char Top_LED_Color;          // Color of top lit LED
 
 int main(void) {
-  TACTL = TASSEL_2 | MC_2;          // start timer in up/down mode
+  P1IN = 0;                 // initialize P1IN to zero
+  TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
 
   // Set the direction of the start button. Keep initial input low.
   P1DIR &= ~START_BUTTON;
@@ -41,8 +42,8 @@ int main(void) {
   seed  = TAR;                       // this is the seed for random(int seed)
 
   // Generate a random sequence of colors for the LED strips 1 and 2
-  int randomColor;
-  for (int i = 0; i < 30; i++ ) {
+  char randomColor;
+  for (char i = 0; i < 30; i++ ) {
     seed = seed + i;
     randomColor = random(seed);
     LED_Strip_1[i] = randomColor;
@@ -114,9 +115,15 @@ int main(void) {
   return 0;
 }
 
-// Generate a random number ranging from 1 to 4.
+// Generate a random number ranging from 0 to 3.
 // This function doesn't truely generate a random number but it is good enough
 // for the purpose of this porject.
-int random(int x) {
-  return ((x % 11) + (x % 3)) % 5;
+char random(char x) {
+  char number = ((x % 11) + (x % 3)) % 5;
+
+  if (number == 4) {
+    return random(x % 13);
+  }
+
+  return number;
 }
