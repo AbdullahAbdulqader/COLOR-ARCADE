@@ -8,7 +8,7 @@
 #define BLUE    ((char)2)
 #define GREEN   ((char)3)
 
-#define BLACK   ((char)5)
+#define BLACK   ((char) -1)
 
 #define RED_BUTTON      BIT0
 #define YELLOW_BUTTON   BIT1
@@ -20,6 +20,10 @@ char LED_Strip_1[30];        // this will hold the color sequence of strip_1
 char LED_Strip_2[30];        // this will hold the color sequence of strip_2
 char Top_LED_Index;          // Index of top lit LED. Will be decremented down to 0.
 char Top_LED_Color;          // Color of top lit LED
+
+// If you don't declare a function and it only appears after being called,
+// it is automatically assumed to be int.
+char random (char x);
 
 int main(void) {
   P1IN = 0;                 // initialize P1IN to zero
