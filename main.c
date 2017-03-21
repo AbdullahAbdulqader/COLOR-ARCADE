@@ -3,10 +3,10 @@
 
 #define START_BUTTON    BIT4
 
-#define RED     ((char)0)
-#define YELLOW  ((char)1)
-#define BLUE    ((char)2)
-#define GREEN   ((char)3)
+#define RED     ((char) 0)
+#define YELLOW  ((char) 1)
+#define BLUE    ((char) 2)
+#define GREEN   ((char) 3)
 
 #define BLACK   ((char) -1)
 
@@ -15,9 +15,11 @@
 #define BLUE_BUTTON     BIT2
 #define GREEN_BUTTON    BIT3
 
+#define STRIP_LENGTH ((char) 30)
+
 char seed;                   // seed for generating a random numbers
-char LED_Strip_1[30];        // this will hold the color sequence of strip_1
-char LED_Strip_2[30];        // this will hold the color sequence of strip_2
+char LED_Strip_1[STRIP_LENGTH];        // this will hold the color sequence of strip_1
+char LED_Strip_2[STRIP_LENGTH];        // this will hold the color sequence of strip_2
 char Top_LED_Index;          // Index of top lit LED. Will be decremented down to 0.
 char Top_LED_Color;          // Color of top lit LED
 
@@ -38,7 +40,7 @@ int main(void) {
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
 
   // Initialize top index
-  Top_LED_Index = 29;
+  Top_LED_Index = STRIP_LENGTH-1;
 
   // Generate random seed
   while ((~P1IN) & START_BUTTON);   // loop while the START_BUTTON is unset
@@ -47,7 +49,7 @@ int main(void) {
 
   // Generate a random sequence of colors for the LED strips 1 and 2
   char randomColor;
-  for (char i = 0; i < 30; i++ ) {
+  for (char i = 0; i < STRIP_LENGTH; i++ ) {
     seed = seed + i;
     randomColor = random(seed);
     LED_Strip_1[i] = randomColor;
