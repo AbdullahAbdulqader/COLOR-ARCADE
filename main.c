@@ -1,19 +1,19 @@
 // ABDULLAH ABDULQADER MARCH 2017
 #include <msp430.h>
 
-#define START_BUTTON    BIT4
+#define START_BUTTON    BIT0
 
 #define RED     ((char) 0)
 #define YELLOW  ((char) 1)
 #define BLUE    ((char) 2)
 #define GREEN   ((char) 3)
 
-#define BLACK   ((char) -1)
+#define OFF   ((char) -1)
 
-#define RED_BUTTON      BIT0
-#define YELLOW_BUTTON   BIT1
-#define BLUE_BUTTON     BIT2
-#define GREEN_BUTTON    BIT3
+#define RED_BUTTON      BIT3
+#define YELLOW_BUTTON   BIT4
+#define BLUE_BUTTON     BIT5
+#define GREEN_BUTTON    BIT6
 
 #define STRIP_LENGTH ((char) 30)
 
