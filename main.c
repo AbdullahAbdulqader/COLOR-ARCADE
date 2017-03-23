@@ -1,7 +1,7 @@
 // ABDULLAH ABDULQADER MARCH 2017
 #include <msp430.h>
 
-#define START_BUTTON    BIT0
+#define START_BUTTON    BIT4
 
 #define RED     ((char) 0)
 #define YELLOW  ((char) 1)
@@ -10,10 +10,10 @@
 
 #define OFF   ((char) -1)
 
-#define RED_BUTTON      BIT3
-#define YELLOW_BUTTON   BIT4
-#define BLUE_BUTTON     BIT5
-#define GREEN_BUTTON    BIT6
+#define RED_BUTTON      BIT0
+#define YELLOW_BUTTON   BIT1
+#define BLUE_BUTTON     BIT2
+#define GREEN_BUTTON    BIT3
 
 #define STRIP_LENGTH ((char) 30)
 
@@ -28,9 +28,8 @@ char Top_LED_Color;          // Color of top lit LED
 char random (char x);
 
 int main(void) {
-  P1IN = 0;                 // initialize P1IN to zero
-  TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
 
+  TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
   // Set the direction of the start button. Keep initial input low.
   P1DIR &= ~START_BUTTON;
   P1IN  &= ~START_BUTTON;
@@ -38,6 +37,8 @@ int main(void) {
   // Set the direction of color bits as input to the msp430. Keep initial input zero.
   P1DIR &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
+
+  P1IN = 0;     // initialize P1IN to zero
 
   // Initialize top index
   Top_LED_Index = STRIP_LENGTH-1;
@@ -53,7 +54,7 @@ int main(void) {
     seed = seed + i;
     randomColor = random(seed);
     LED_Strip_1[i] = randomColor;
-    LED_Strip_2[i] = randomColor;
+    // LED_Strip_2[i] = randomColor;
     // printf("LED_Strip_1[%d] = %d\n", i, LED_Strip_1[i] );
   }
 
@@ -64,12 +65,11 @@ int main(void) {
 
   // Listen to player input. Condition: there are still lit LED(s).
   while(Top_LED_Index >= 0) {
-    // wait for an input
-    while ((~P1IN & RED_BUTTON) || (~P1IN & YELLOW_BUTTON) ||
-            (~P1IN & BLUE_BUTTON) || (~P1IN & GREEN_BUTTON) );
+    // loop while all buttons are unset. wait for an input to break out of the loop
+    while ((~P1IN & RED_BUTTON) && (~P1IN & YELLOW_BUTTON) && (~P1IN & BLUE_BUTTON) && (~P1IN & GREEN_BUTTON) );
 
     // If the red button was pushed
-    if (P1IN == RED_BUTTON) {
+    if (P1IN & RED_BUTTON) {
       //check if the top color is red
       if (Top_LED_Color == RED) {
         // Turn off the top LED
@@ -79,7 +79,7 @@ int main(void) {
     }
 
     // If the yellow button was pushed
-    if (P1IN == YELLOW_BUTTON) {
+    if (P1IN & YELLOW_BUTTON) {
       //check if the top color is red
       if (Top_LED_Color == YELLOW) {
         // Turn off the top LED
@@ -89,7 +89,7 @@ int main(void) {
     }
 
     // If the blue button was pushed
-    if (P1IN == BLUE_BUTTON) {
+    if (P1IN & BLUE_BUTTON) {
       //check if the top color is red
       if (Top_LED_Color == BLUE) {
         // Turn off the top LED
@@ -99,7 +99,7 @@ int main(void) {
     }
 
     // If the green button was pushed
-    if (P1IN == GREEN_BUTTON) {
+    if (P1IN & GREEN_BUTTON) {
       //check if the top color is red
       if (Top_LED_Color == GREEN) {
         // Turn off the top LED
@@ -114,8 +114,9 @@ int main(void) {
     // Assign the new top lit LED color to Top_LED_Color
     Top_LED_Color = LED_Strip_1[Top_LED_Index];
 
-    // Reset P1IN
-    P1IN &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
+    // Wait for input to be get back to zero
+    while ( (P1IN & RED_BUTTON) || (P1IN & YELLOW_BUTTON) || (P1IN & BLUE_BUTTON) || (P1IN & GREEN_BUTTON) );
+
   }
 
   return 0;
