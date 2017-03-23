@@ -8,20 +8,20 @@
 #define BLUE    ((char) 2)
 #define GREEN   ((char) 3)
 
-#define OFF   ((char) -1)
+#define LED_OFF   ((signed char) -1)
 
 #define RED_BUTTON      BIT0
 #define YELLOW_BUTTON   BIT1
 #define BLUE_BUTTON     BIT2
 #define GREEN_BUTTON    BIT3
 
-#define STRIP_LENGTH ((char) 30)
+#define STRIP_LENGTH ((char) 2)
 
-char seed;                   // seed for generating a random numbers
-char LED_Strip_1[STRIP_LENGTH];        // this will hold the color sequence of strip_1
-char LED_Strip_2[STRIP_LENGTH];        // this will hold the color sequence of strip_2
-char Top_LED_Index;          // Index of top lit LED. Will be decremented down to 0.
-char Top_LED_Color;          // Color of top lit LED
+char seed;                         // seed for generating a random numbers
+signed char strip_1[STRIP_LENGTH];        // this will hold the color sequence of strip_1
+// signed char strip_2[STRIP_LENGTH];        // this will hold the color sequence of strip_2
+signed char Top_LED_Index;                // Index of top lit LED. Will be decremented down to 0.
+signed char Top_LED_Color;                // Color of top lit LED
 
 // If you don't declare a function and it only appears after being called,
 // it is automatically assumed to be int.
@@ -38,8 +38,6 @@ int main(void) {
   P1DIR &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
 
-  P1IN = 0;     // initialize P1IN to zero
-
   // Initialize top index
   Top_LED_Index = STRIP_LENGTH-1;
 
@@ -53,13 +51,13 @@ int main(void) {
   for (char i = 0; i < STRIP_LENGTH; i++ ) {
     seed = seed + i;
     randomColor = random(seed);
-    LED_Strip_1[i] = randomColor;
-    // LED_Strip_2[i] = randomColor;
-    // printf("LED_Strip_1[%d] = %d\n", i, LED_Strip_1[i] );
+    strip_1[i] = randomColor;
+    // strip_2[i] = randomColor;
+    // printf("strip_1[%d] = %d\n", i, strip_1[i] );
   }
 
   // Initialize top LED color
-  Top_LED_Color = LED_Strip_1[Top_LED_Index];
+  Top_LED_Color = strip_1[Top_LED_Index];
 
   // Light up the addressable LED strips
 
@@ -73,6 +71,11 @@ int main(void) {
       //check if the top color is red
       if (Top_LED_Color == RED) {
         // Turn off the top LED
+        strip_1[Top_LED_Index] = LED_OFF;
+        // Decrement Top_LED_Index
+        Top_LED_Index--;
+        // Assign the new top lit LED color to Top_LED_Color
+        Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
       }
@@ -83,6 +86,11 @@ int main(void) {
       //check if the top color is red
       if (Top_LED_Color == YELLOW) {
         // Turn off the top LED
+        strip_1[Top_LED_Index] = LED_OFF;
+        // Decrement Top_LED_Index
+        Top_LED_Index--;
+        // Assign the new top lit LED color to Top_LED_Color
+        Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
       }
@@ -93,6 +101,11 @@ int main(void) {
       //check if the top color is red
       if (Top_LED_Color == BLUE) {
         // Turn off the top LED
+        strip_1[Top_LED_Index] = LED_OFF;
+        // Decrement Top_LED_Index
+        Top_LED_Index--;
+        // Assign the new top lit LED color to Top_LED_Color
+        Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
       }
@@ -103,19 +116,20 @@ int main(void) {
       //check if the top color is red
       if (Top_LED_Color == GREEN) {
         // Turn off the top LED
+        strip_1[Top_LED_Index] = LED_OFF;
+        // Decrement Top_LED_Index
+        Top_LED_Index--;
+        // Assign the new top lit LED color to Top_LED_Color
+        Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
       }
     }
 
-    // Decrement Top_LED_Index
-    Top_LED_Index--;
-
-    // Assign the new top lit LED color to Top_LED_Color
-    Top_LED_Color = LED_Strip_1[Top_LED_Index];
-
     // Wait for input to be get back to zero
     while ( (P1IN & RED_BUTTON) || (P1IN & YELLOW_BUTTON) || (P1IN & BLUE_BUTTON) || (P1IN & GREEN_BUTTON) );
+
+    // UPDATE STRIP LED LIGHTS HERE (ONLY UPDATE THE STRIP LIGHTS AFTER PLAYER TURNED ALL INPUT BACK TO ZERO)
 
   }
 
