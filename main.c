@@ -16,17 +16,45 @@
 #define BLUE_BUTTON     BIT2
 #define GREEN_BUTTON    BIT3
 
-#define STRIP_LENGTH ((char) 30)
-
 char seed;                         // seed for generating a random numbers
-signed char strip_1[STRIP_LENGTH];        // this will hold the color sequence of strip_1
-// signed char strip_2[STRIP_LENGTH];        // this will hold the color sequence of strip_2
+signed char strip_1[NUM_LEDS];        // this will hold the color sequence of strip_1
+// signed char strip_2[NUM_LEDS];        // this will hold the color sequence of strip_2
 signed char Top_LED_Index;                // Index of top lit LED. Will be decremented down to 0.
 signed char Top_LED_Color;                // Color of top lit LED
 
-// If you don't declare a function and it only appears after being called,
-// it is automatically assumed to be int.
-char random (char x);
+
+// Generate a random number ranging from 0 to 3.
+// This function doesn't truely generate a random number but it is good enough
+// for the purpose of this porject.
+char random(char x) {
+  char number = ((x % 11) + (x % 3)) % 5;
+
+  if (number == 4) {
+    return random(x % 13);
+  }
+
+  return number;
+}
+
+// assign colors to all LEDS
+void colorLEDS(char strip_x[NUM_LEDS]) {
+  for (char i = 0; i < NUM_LEDS; i++) {
+    switch (strip_x[i]) {
+      case RED:
+        setLEDColor(i, 0xFF, 0x00, 0x00);
+        break;
+      case YELLOW:
+        setLEDColor(i, 0xFF, 0xFF, 0x00);
+        break;
+      case BLUE:
+        setLEDColor(i, 0x00, 0x00, 0xFF);
+        break;
+      case GREEN:
+        setLEDColor(i, 0x00, 0xFF, 0x00);
+        break;
+    }
+  }
+}
 
 // WS2812 takes GRB format
 typedef struct {
@@ -107,7 +135,18 @@ void fillStrip(u_char r, u_char g, u_char b) {
 
 
 int main(void) {
-  WDTCTL = WDTPW + WDTHOLD; // Stop WDT
+  WDTCTL = WDTPW + WDTHOLD;  // Stop WDT
+  if (CALBC1_16MHZ==0xFF)    // If calibration constant erased
+  {
+      while(1);              // do not load, trap CPU!!
+  }
+
+  // configure clock to 16 MHz
+  BCSCTL1 = CALBC1_16MHZ;    // DCO = 16 MHz
+  DCOCTL = CALDCO_16MHZ;
+
+  // initialize LED strip
+  initStrip();
 
   TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
   // Set the direction of the start button. Keep initial input low.
@@ -119,7 +158,7 @@ int main(void) {
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
 
   // Initialize top index
-  Top_LED_Index = STRIP_LENGTH-1;
+  Top_LED_Index = NUM_LEDS-1;
 
   // Generate random seed
   while ((~P1IN) & START_BUTTON);   // loop while the START_BUTTON is unset
@@ -128,7 +167,7 @@ int main(void) {
 
   // Generate a random sequence of colors for the LED strips 1 and 2
   char randomColor;
-  for (char i = 0; i < STRIP_LENGTH; i++ ) {
+  for (char i = 0; i < NUM_LEDS; i++ ) {
     seed = seed + i;
     randomColor = random(seed);
     strip_1[i] = randomColor;
@@ -139,7 +178,11 @@ int main(void) {
   // Initialize top LED color
   Top_LED_Color = strip_1[Top_LED_Index];
 
+  // assign colors to LEDs
+  colorLEDS(strip_1);
+
   // Light up the addressable LED strips
+  showStrip();
 
   // Listen to player input. Condition: there are still lit LED(s).
   while(Top_LED_Index >= 0) {
@@ -214,17 +257,4 @@ int main(void) {
   }
 
   return 0;
-}
-
-// Generate a random number ranging from 0 to 3.
-// This function doesn't truely generate a random number but it is good enough
-// for the purpose of this porject.
-char random(char x) {
-  char number = ((x % 11) + (x % 3)) % 5;
-
-  if (number == 4) {
-    return random(x % 13);
-  }
-
-  return number;
 }
