@@ -37,7 +37,7 @@ char random(char x) {
 }
 
 // assign colors to all LEDS
-void colorLEDS(char strip_x[NUM_LEDS]) {
+void colorLEDS(signed char strip_x[NUM_LEDS]) {
   for (char i = 0; i < NUM_LEDS; i++) {
     switch (strip_x[i]) {
       case RED:
@@ -51,6 +51,9 @@ void colorLEDS(char strip_x[NUM_LEDS]) {
         break;
       case GREEN:
         setLEDColor(i, 0x00, 0xFF, 0x00);
+        break;
+      case LED_OFF:
+        setLEDColor(i, 0x00, 0x00, 0x00);
         break;
     }
   }
@@ -253,7 +256,8 @@ int main(void) {
     while ( (P1IN & RED_BUTTON) || (P1IN & YELLOW_BUTTON) || (P1IN & BLUE_BUTTON) || (P1IN & GREEN_BUTTON) );
 
     // UPDATE STRIP LED LIGHTS HERE (ONLY UPDATE THE STRIP LIGHTS AFTER PLAYER TURNED ALL INPUT BACK TO ZERO)
-
+    colorLEDS(strip_1);
+    showStrip();
   }
 
   return 0;
