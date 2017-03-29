@@ -28,6 +28,7 @@ signed char Top_LED_Color;                // Color of top lit LED
 char random (char x);
 
 int main(void) {
+  WDTCTL = WDTPW + WDTHOLD; // Stop WDT
 
   TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
   // Set the direction of the start button. Keep initial input low.
