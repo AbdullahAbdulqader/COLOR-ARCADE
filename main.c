@@ -22,43 +22,6 @@ signed char strip_1[NUM_LEDS];        // this will hold the color sequence of st
 signed char Top_LED_Index;                // Index of top lit LED. Will be decremented down to 0.
 signed char Top_LED_Color;                // Color of top lit LED
 
-
-// Generate a random number ranging from 0 to 3.
-// This function doesn't truely generate a random number but it is good enough
-// for the purpose of this porject.
-char random(char x) {
-  char number = ((x % 11) + (x % 3)) % 5;
-
-  if (number == 4) {
-    return random(x % 13);
-  }
-
-  return number;
-}
-
-// assign colors to all LEDS
-void colorLEDS(signed char strip_x[NUM_LEDS]) {
-  for (char i = 0; i < NUM_LEDS; i++) {
-    switch (strip_x[i]) {
-      case RED:
-        setLEDColor(i, 0xFF, 0x00, 0x00);
-        break;
-      case YELLOW:
-        setLEDColor(i, 0xFF, 0xFF, 0x00);
-        break;
-      case BLUE:
-        setLEDColor(i, 0x00, 0x00, 0xFF);
-        break;
-      case GREEN:
-        setLEDColor(i, 0x00, 0xFF, 0x00);
-        break;
-      case LED_OFF:
-        setLEDColor(i, 0x00, 0x00, 0x00);
-        break;
-    }
-  }
-}
-
 // WS2812 takes GRB format
 typedef struct {
     u_char green;
@@ -135,6 +98,57 @@ void fillStrip(u_char r, u_char g, u_char b) {
     showStrip();  // refresh strip
 }
 
+// Generate a random number ranging from 0 to 3.
+// This function doesn't truely generate a random number but it is good enough
+// for the purpose of this porject.
+char random(char x) {
+  char number = ((x % 11) + (x % 3)) % 5;
+
+  if (number == 4) {
+    return random(x % 13);
+  }
+
+  return number;
+}
+
+// assign colors to all LEDS
+void colorLEDS(signed char strip_x[NUM_LEDS]) {
+  for (char i = 0; i < NUM_LEDS; i++) {
+    switch (strip_x[i]) {
+      case RED:
+        setLEDColor(i, 0xFF, 0x00, 0x00);
+        break;
+      case YELLOW:
+        setLEDColor(i, 0xFF, 0xFF, 0x00);
+        break;
+      case BLUE:
+        setLEDColor(i, 0x00, 0x00, 0xFF);
+        break;
+      case GREEN:
+        setLEDColor(i, 0x00, 0xFF, 0x00);
+        break;
+      case LED_OFF:
+        setLEDColor(i, 0x00, 0x00, 0x00);
+        break;
+    }
+  }
+}
+
+// penalty when wrong button is pressed
+void penalty() {
+  fillStrip(0x00, 0x00, 0x00);
+  showStrip();
+  __delay_cycles(8000000);
+  fillStrip(0xFF, 0x00, 0x00);
+  showStrip();
+  __delay_cycles(8000000);
+  fillStrip(0x00, 0x00, 0x00);
+  showStrip();
+  __delay_cycles(8000000);
+  fillStrip(0xFF, 0x00, 0x00);
+  showStrip();
+  __delay_cycles(8000000);
+}
 
 
 int main(void) {
@@ -204,6 +218,7 @@ int main(void) {
         Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
+        penalty();
       }
     }
 
@@ -219,6 +234,7 @@ int main(void) {
         Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
+        penalty();
       }
     }
 
@@ -234,6 +250,7 @@ int main(void) {
         Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
+        penalty();
       }
     }
 
@@ -249,6 +266,7 @@ int main(void) {
         Top_LED_Color = strip_1[Top_LED_Index];
       } else {
         // Penalty
+        penalty();
       }
     }
 
