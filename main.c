@@ -3,6 +3,8 @@
 #include "ws2812.h"
 
 #define START_BUTTON    BIT4
+#define TO_OPPONENT     BIT5
+#define FROM_OPPONENT   BIT6
 
 #define RED     ((char) 0)
 #define YELLOW  ((char) 1)
@@ -165,10 +167,19 @@ int main(void) {
   // initialize LED strip
   initStrip();
 
+  fillStrip(0xFF,0x00,0x00);
+
   TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
+
   // Set the direction of the start button. Keep initial input low.
   P1DIR &= ~START_BUTTON;
   P1IN  &= ~START_BUTTON;
+
+  // Set the direction of OPPONENT pins
+  P1DIR |= TO_OPPONENT;
+  P1OUT &= ~TO_OPPONENT; //initialize it to low
+  P1DIR &= ~FROM_OPPONENT;
+  P1IN &= ~FROM_OPPONENT; //initialize it to low
 
   // Set the direction of color bits as input to the msp430. Keep initial input zero.
   P1DIR &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
@@ -177,8 +188,11 @@ int main(void) {
   // Initialize top index
   Top_LED_Index = NUM_LEDS-1;
 
-  // Generate random seed
   while ((~P1IN) & START_BUTTON);   // loop while the START_BUTTON is unset
+  P1OUT |= TO_OPPONENT;             // set this bit, tell opponent i'm ready
+  while ((~P1IN) & FROM_OPPONENT);  // wait for opponent to be ready
+
+  // Generate seed from the timer value
   TACTL = TASSEL_1 | MC_0;          // stop timer once START_BUTTON is pushed
   seed  = TAR;                       // this is the seed for random(int seed)
 
