@@ -100,6 +100,25 @@ void fillStrip(u_char r, u_char g, u_char b) {
     showStrip();  // refresh strip
 }
 
+// Gradually fill the strip and show it.
+void gradualFill(u_int n, u_char r, u_char g, u_char b){
+    int i;
+    for (i = 0; i < n; i++){        // n is number of LEDs
+        setLEDColor(i, r, g, b);
+        showStrip();
+        __delay_cycles(150000);       // lazy delay
+    }
+}
+
+void winner() {
+  gradualFill(NUM_LEDS, 0x00, 0xFF, 0x00);  // green
+  gradualFill(NUM_LEDS, 0x00, 0x00, 0xFF);  // blue
+  gradualFill(NUM_LEDS, 0xFF, 0x00, 0xFF);  // magenta
+  gradualFill(NUM_LEDS, 0xFF, 0xFF, 0x00);  // yellow
+  gradualFill(NUM_LEDS, 0x00, 0xFF, 0xFF);  // cyan
+  gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
+}
+
 // Generate a random number ranging from 0 to 3.
 // This function doesn't truely generate a random number but it is good enough
 // for the purpose of this porject.
@@ -114,7 +133,7 @@ char random(char x) {
 }
 
 // assign colors to all LEDS
-void colorLEDS(signed char strip_x[NUM_LEDS]) {
+void assignColors(signed char strip_x[NUM_LEDS]) {
   for (char i = 0; i < NUM_LEDS; i++) {
     switch (strip_x[i]) {
       case RED:
@@ -210,7 +229,7 @@ int main(void) {
   Top_LED_Color = strip_1[Top_LED_Index];
 
   // assign colors to LEDs
-  colorLEDS(strip_1);
+  assignColors(strip_1);
 
   // Light up the addressable LED strips
   showStrip();
@@ -288,8 +307,12 @@ int main(void) {
     while ( (P1IN & RED_BUTTON) || (P1IN & YELLOW_BUTTON) || (P1IN & BLUE_BUTTON) || (P1IN & GREEN_BUTTON) );
 
     // UPDATE STRIP LED LIGHTS HERE (ONLY UPDATE THE STRIP LIGHTS AFTER PLAYER TURNED ALL INPUT BACK TO ZERO)
-    colorLEDS(strip_1);
+    assignColors(strip_1);
     showStrip();
+  }
+
+  while (1) {
+    winner();
   }
 
   return 0;
