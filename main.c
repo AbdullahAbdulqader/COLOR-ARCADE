@@ -24,6 +24,8 @@ signed char strip_1[NUM_LEDS];        // this will hold the color sequence of st
 signed char Top_LED_Index;                // Index of top lit LED. Will be decremented down to 0.
 signed char Top_LED_Color;                // Color of top lit LED
 
+unsigned char hasOppWon = 0;
+
 // WS2812 takes GRB format
 typedef struct {
     u_char green;
@@ -110,6 +112,16 @@ void gradualFill(u_int n, u_char r, u_char g, u_char b){
     }
 }
 
+// check if oppnenet has won
+void checkOpponent() {
+  if (P1IN & FROM_OPPONENT) {
+    hasOppWon = ((char) 1);
+  } else {
+    hasOppWon = ((char) 0);
+  }
+}
+
+// Winner strip lighting effect
 void winner() {
   gradualFill(NUM_LEDS, 0x00, 0xFF, 0x00);  // green
   gradualFill(NUM_LEDS, 0x00, 0x00, 0xFF);  // blue
@@ -117,6 +129,16 @@ void winner() {
   gradualFill(NUM_LEDS, 0xFF, 0xFF, 0x00);  // yellow
   gradualFill(NUM_LEDS, 0x00, 0xFF, 0xFF);  // cyan
   gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
+}
+
+// Loser strip lighting effect
+void loser() {
+  gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
+  gradualFill(NUM_LEDS, 0x00, 0x00, 0x00);  // black
+  gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
+  gradualFill(NUM_LEDS, 0x00, 0x00, 0x00);  // black
+  gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
+  gradualFill(NUM_LEDS, 0x00, 0x00, 0x00);  // black
 }
 
 // Generate a random number ranging from 0 to 3.
@@ -168,7 +190,7 @@ void penalty() {
   __delay_cycles(8000000);
   fillStrip(0xFF, 0x00, 0x00);
   showStrip();
-  __delay_cycles(8000000);
+  __delay_cycles(3000000);
 }
 
 
@@ -208,8 +230,9 @@ int main(void) {
   Top_LED_Index = NUM_LEDS-1;
 
   while ((~P1IN) & START_BUTTON);   // loop while the START_BUTTON is unset
-  P1OUT |= TO_OPPONENT;             // set this bit, tell opponent i'm ready
+  P1OUT |= TO_OPPONENT;             // set this bit to tell opponent i'm ready
   while ((~P1IN) & FROM_OPPONENT);  // wait for opponent to be ready
+  P1OUT &= ~TO_OPPONENT;            // unset this bit for later use
 
   // Generate seed from the timer value
   TACTL = TASSEL_1 | MC_0;          // stop timer once START_BUTTON is pushed
@@ -234,8 +257,9 @@ int main(void) {
   // Light up the addressable LED strips
   showStrip();
 
-  // Listen to player input. Condition: there are still lit LED(s).
-  while(Top_LED_Index >= 0) {
+  // Listen to player input. Condition: other player haven't won yet & there are still lit LEDs.
+  //TODO: create an interrupt if opponent won
+  while (!hasOppWon & (Top_LED_Index >= 0) ) {
     // loop while all buttons are unset. wait for an input to break out of the loop
     while ((~P1IN & RED_BUTTON) && (~P1IN & YELLOW_BUTTON) && (~P1IN & BLUE_BUTTON) && (~P1IN & GREEN_BUTTON) );
 
@@ -303,16 +327,33 @@ int main(void) {
       }
     }
 
+    __delay_cycles(5000000);       // delay a bit to prevent errors from the buttons
+                                  // due to current fluctiations
+
     // Wait for input to be get back to zero
     while ( (P1IN & RED_BUTTON) || (P1IN & YELLOW_BUTTON) || (P1IN & BLUE_BUTTON) || (P1IN & GREEN_BUTTON) );
 
     // UPDATE STRIP LED LIGHTS HERE (ONLY UPDATE THE STRIP LIGHTS AFTER PLAYER TURNED ALL INPUT BACK TO ZERO)
     assignColors(strip_1);
     showStrip();
+
+    //check if oppenent won
+    checkOpponent();
   }
 
-  while (1) {
-    winner();
+  //set this bit to tell opponent that I won.
+  if (!hasOppWon) {
+    P1OUT |= TO_OPPONENT;
+  }
+
+  if (hasOppWon) {
+    while (1) { //TODO: create interrupt so that game restarts
+      loser();
+    }
+  } else {
+    while (1) { //TODO: create interrupt so that game restarts
+      winner();
+    }
   }
 
   return 0;
