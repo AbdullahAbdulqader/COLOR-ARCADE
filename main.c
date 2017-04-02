@@ -128,7 +128,6 @@ void winner() {
   gradualFill(NUM_LEDS, 0xFF, 0x00, 0xFF);  // magenta
   gradualFill(NUM_LEDS, 0xFF, 0xFF, 0x00);  // yellow
   gradualFill(NUM_LEDS, 0x00, 0xFF, 0xFF);  // cyan
-  gradualFill(NUM_LEDS, 0xFF, 0x00, 0x00);  // red
 }
 
 // Loser strip lighting effect

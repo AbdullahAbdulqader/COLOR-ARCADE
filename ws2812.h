@@ -1,6 +1,6 @@
 // Configuration - SET THESE!
-#define OUTPUT_PIN  (BIT7)  // Set to whatever UCB0SIMO is on your processor (Px.7 here)  
-#define NUM_LEDS    (30)    // NUMBER OF LEDS IN YOUR STRIP
+#define OUTPUT_PIN  (BIT7)  // Set to whatever UCB0SIMO is on your processor (Px.7 here)
+#define NUM_LEDS    (10)    // NUMBER OF LEDS IN YOUR STRIP
 
 // Useful typedefs
 typedef unsigned char u_char;	// 8 bit
