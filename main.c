@@ -20,7 +20,6 @@
 
 char seed;                         // seed for generating a random numbers
 signed char strip_1[NUM_LEDS];        // this will hold the color sequence of strip_1
-// signed char strip_2[NUM_LEDS];        // this will hold the color sequence of strip_2
 signed char Top_LED_Index;                // Index of top lit LED. Will be decremented down to 0.
 signed char Top_LED_Color;                // Color of top lit LED
 
@@ -140,6 +139,20 @@ void loser() {
   gradualFill(NUM_LEDS, 0x00, 0x00, 0x00);  // black
 }
 
+// ready ... set ... go!
+void readySetGo() {
+  gradualFill(NUM_LEDS,0xFF,0x00,0x00); // red
+  __delay_cycles(8000000);
+  gradualFill(NUM_LEDS,0x00,0x00,0x00);
+  __delay_cycles(8000000);
+  gradualFill(NUM_LEDS,0xFF,0xFF,0x00); // yellow
+  __delay_cycles(8000000);
+  gradualFill(NUM_LEDS,0x00,0x00,0x00);
+  __delay_cycles(8000000);
+  gradualFill(NUM_LEDS,0x00,0xFF,0x00); // green
+  __delay_cycles(8000000);
+}
+
 // Generate a random number ranging from 0 to 3.
 // This function doesn't truely generate a random number but it is good enough
 // for the purpose of this porject.
@@ -207,7 +220,7 @@ int main(void) {
   // initialize LED strip
   initStrip();
 
-  fillStrip(0xFF,0x00,0x00);
+  // fillStrip(0x01,0x00,0x00);
 
   TACTL = TASSEL_2 | MC_2;  // start timer in up/down mode
 
@@ -243,9 +256,9 @@ int main(void) {
     seed = seed + i;
     randomColor = random(seed);
     strip_1[i] = randomColor;
-    // strip_2[i] = randomColor;
-    // printf("strip_1[%d] = %d\n", i, strip_1[i] );
   }
+
+  readySetGo();
 
   // Initialize top LED color
   Top_LED_Color = strip_1[Top_LED_Index];
@@ -346,11 +359,11 @@ int main(void) {
   }
 
   if (hasOppWon) {
-    while (1) { //TODO: create interrupt so that game restarts
+    while (1) {
       loser();
     }
   } else {
-    while (1) { //TODO: create interrupt so that game restarts
+    while (1) {
       winner();
     }
   }
