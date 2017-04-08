@@ -238,6 +238,9 @@ int main(void) {
   P1DIR &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
   P1IN  &= ~(RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON);
 
+  // Enable the Pullup/ Pulldown R.
+  P1REN |= RED_BUTTON + YELLOW_BUTTON + BLUE_BUTTON + GREEN_BUTTON + START_BUTTON + FROM_OPPONENT;
+
   // Initialize top index
   Top_LED_Index = NUM_LEDS-1;
 
@@ -266,11 +269,12 @@ int main(void) {
   // assign colors to LEDs
   assignColors(strip_1);
 
+  __delay_cycles(5000000);
+
   // Light up the addressable LED strips
   showStrip();
 
   // Listen to player input. Condition: other player haven't won yet & there are still lit LEDs.
-  //TODO: create an interrupt if opponent won
   while (!hasOppWon & (Top_LED_Index >= 0) ) {
     // loop while all buttons are unset. wait for an input to break out of the loop
     while ((~P1IN & RED_BUTTON) && (~P1IN & YELLOW_BUTTON) && (~P1IN & BLUE_BUTTON) && (~P1IN & GREEN_BUTTON) );
