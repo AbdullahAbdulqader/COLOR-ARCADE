@@ -6,7 +6,7 @@ The objective is to turn off all 30 LEDs from the strip’s top to its bottom, t
 
 ![ScreenShot](/color_arcade_imgs/1.jpg?raw=true)
 
-# LED Strip Lights
+## LED Strip Lights
 The MSP430G2553 launchpad, WS2811 LED strips, and colored momentary
 switch buttons are the main equipment of this project. The WS2811 RGB LED strips are
 addressable, meaning it includes an IC chip in between each and every LED, making it
@@ -14,14 +14,14 @@ possible to control each LED individually. Runs on 5V, about 18W per meter.
 
 ![ScreenShot](/color_arcade_imgs/3.jpg?raw=true)
 
-# Controllers
+## Controllers
 I made controllers by mounting the colored buttons on small hand sized boxes,
 as shown in figure 2, so that players can easily control the strips. The pins P1.0 - P.3 on
 the launchpad are take the controllers' input.
 
 ![ScreenShot](/color_arcade_imgs/4.jpg?raw=true)
 
-# Game Logic
+## Game Logic
 To start the game, both players have to push the start button (mounted on the
 breadboard) connected to P1.4. For that to work, I had to make both launchpads communicate with each other: P1.5 was used to send out a signal to the other launchpad,
 and P1.6 was used to receive a signal from the other launchpad. P1.5 and P1.6 are
